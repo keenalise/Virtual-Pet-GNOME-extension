@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <enum id="org.gnome.shell.extensions.desktop-dog.corner">
+    <value nick="bottom-right" value="0"/>
+    <value nick="bottom-left"  value="1"/>
+    <value nick="top-right"    value="2"/>
+    <value nick="top-left"     value="3"/>
+    <value nick="center"       value="4"/>
+  </enum>
+
+  <schema id="org.gnome.shell.extensions.desktop-dog"
+          path="/org/gnome/shell/extensions/desktop-dog/">
+
+    <key name="pos-x" type="i">
+      <default>-1</default>
+      <summary>Saved X position</summary>
+      <description>Last horizontal position in pixels. -1 means "not set yet; use the initial corner".</description>
+    </key>
+
+    <key name="pos-y" type="i">
+      <default>-1</default>
+      <summary>Saved Y position</summary>
+      <description>Last vertical position in pixels. -1 means "not set yet; use the initial corner".</description>
+    </key>
+
+    <key name="dog-size" type="i">
+      <range min="64" max="220"/>
+      <default>128</default>
+      <summary>Dog size</summary>
+      <description>On-screen size of the dog in pixels.</description>
+    </key>
+
+    <key name="enable-animations" type="b">
+      <default>true</default>
+      <summary>Enable animations</summary>
+      <description>Master switch for all idle and reaction animations. When off, the dog is a still image.</description>
+    </key>
+
+    <key name="idle-breathing" type="b">
+      <default>true</default>
+      <summary>Idle breathing</summary>
+      <description>Subtle up-and-down breathing motion while the dog is idle.</description>
+    </key>
+
+    <key name="enable-sound" type="b">
+      <default>false</default>
+      <summary>Enable sound</summary>
+      <description>Play a short sound on interactions (requires GSound; silent if unavailable).</description>
+    </key>
+
+    <key name="initial-position" enum="org.gnome.shell.extensions.desktop-dog.corner">
+      <default>"bottom-right"</default>
+      <summary>Initial corner</summary>
+      <description>Where the dog appears on first run and after "Reset position".</description>
+    </key>
+
+    <key name="animation-frequency" type="i">
+      <range min="0" max="100"/>
+      <default>50</default>
+      <summary>Idle animation frequency</summary>
+      <description>How often idle blinks and tail wags happen (0 = rarely, 100 = often).</description>
+    </key>
+
+    <key name="show-dog" type="b">
+      <default>true</default>
+      <summary>Show the dog</summary>
+      <description>Whether the dog is visible on the desktop.</description>
+    </key>
+
+    <key name="is-sleeping" type="b">
+      <default>false</default>
+      <summary>Sleeping state</summary>
+      <description>Remembers whether the dog was asleep across restarts.</description>
+    </key>
+
+    <key name="reset-position" type="b">
+      <default>false</default>
+      <summary>Reset-position trigger</summary>
+      <description>Set to true by preferences to ask the running extension to move the dog back to its initial corner. The extension sets it back to false.</description>
+    </key>
+  </schema>
+</schemalist>

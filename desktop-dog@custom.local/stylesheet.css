@@ -1,0 +1,26 @@
+/* Desktop Dog — GNOME Shell stylesheet.
+ * Kept intentionally minimal: the dog itself is an SVG icon, so the only
+ * styling here is making the host widgets transparent and the floating
+ * "heart / zzz" effect label look nice. */
+
+.desktop-dog {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Floating effect text (hearts when happy/petted, "z" when sleeping). */
+.desktop-dog-fx {
+    color: #ff6b8b;
+    font-size: 22px;
+    font-weight: bold;
+    text-align: center;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+/* Small polish on the right-click menu. */
+.desktop-dog-menu .popup-menu-item {
+    spacing: 8px;
+    font-size: 11pt;
+}

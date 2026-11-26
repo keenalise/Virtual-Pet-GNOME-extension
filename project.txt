@@ -1,0 +1,187 @@
+Project: Interactive Desktop Dog – Native GNOME Shell Extension
+Act as a senior Linux desktop developer specializing in GNOME Shell extensions, GJS, JavaScript, GTK, and GNOME Shell internals.
+I want you to develop a complete, working, native GNOME Shell extension that displays a cute animated dog on my Ubuntu desktop.
+This must be a proper GNOME Shell extension, NOT a standalone application.
+1. My system specifications
+
+* Operating System: Ubuntu 24.04.4 LTS
+* Desktop Environment: GNOME 46
+* Display Server: X11
+* Architecture: x86_64
+* Window Manager: Mutter
+* Extension Manager: Installed
+* Programming environment: GJS / JavaScript
+
+Target GNOME Shell version 46. Make sure the implementation uses APIs compatible with GNOME 46.
+2. Main concept
+Create a cute, small, animated pixel-art dog that lives on my desktop.
+The dog should behave like a little virtual companion.
+IMPORTANT: I DO NOT WANT a dog that constantly runs, jumps, falls from the top of the screen, climbs windows, or moves around automatically.
+The dog must remain stationary unless I interact with it.
+3. Required features
+A. Dog appearance
+
+* Create an original, adorable pixel-art puppy.
+* Use a transparent background.
+* The dog should have a cute appearance, expressive eyes, and a friendly personality.
+* Use high-quality pixel-art sprites.
+* Make the dog relatively small, approximately 100–150 pixels in visual size.
+* Include multiple animation states.
+
+B. Idle behaviour
+When the user does nothing, the dog should:
+
+* Remain in its current position.
+* Occasionally blink.
+* Occasionally move its ears or tail.
+* Have subtle breathing animations.
+* Never automatically walk or jump around the desktop.
+
+C. Interactive behaviour
+Implement these interactions:
+
+1. Single click: The dog reacts happily.
+2. Double click: The dog performs a playful animation.
+3. Click and hold: Allow the user to drag the dog anywhere on the screen.
+4. Release after dragging: The dog remains exactly where it was dropped.
+5. Right-click: Display a small context menu.
+
+The context menu should include:
+
+* Pet the dog.
+* Feed the dog.
+* Play animation.
+* Sleep / Wake up.
+* Toggle sound.
+* Reset position.
+* Hide / Show dog.
+
+D. Dog animations
+Create separate animations for:
+
+* Idle.
+* Blinking.
+* Happy.
+* Tail wagging.
+* Sleeping.
+* Eating.
+* Playing.
+* Being petted.
+
+Use sprite sheets or individual transparent PNG/SVG assets.
+All animations should be smooth and lightweight.
+E. Positioning
+
+* The dog should initially appear in the bottom-right corner.
+* It must stay at its current screen position.
+* Allow dragging to reposition it.
+* Remember its last position when GNOME Shell restarts.
+* Add an option to reset its position.
+* Make it possible to hide and show the dog.
+
+F. Performance
+
+* Keep CPU and RAM consumption low.
+* Avoid unnecessary animation loops.
+* Only run animations when necessary.
+* Use GNOME Shell's supported animation and actor APIs.
+* Clean up timers, signals, actors, and event handlers when the extension is disabled.
+
+4. Technical implementation
+Build this as a native GNOME Shell extension using:
+
+* GJS.
+* GNOME Shell extension APIs.
+* St.Widget / appropriate GNOME Shell actors.
+* Clutter animation and event APIs.
+* CSS for styling.
+* GSettings for persistent settings if appropriate.
+
+Use a transparent overlay actor integrated into the GNOME Shell stage.
+The dog should appear above normal desktop windows if possible, without blocking normal mouse interaction except when the pointer is actually over the dog.
+Do not use:
+
+* Electron.
+* Python desktop overlays.
+* Qt.
+* Web-based desktop applications.
+* External background services.
+* Unnecessary third-party dependencies.
+
+Do not disable GNOME Shell security features.
+5. Extension structure
+Generate a complete extension directory with the following structure:
+[desktop-dog@custom.local](mailto:desktop-dog@custom.local)/
+├── metadata.json
+├── extension.js
+├── stylesheet.css
+├── prefs.js
+├── schemas/
+│ └── org.gnome.shell.extensions.desktop-dog.gschema.xml
+└── assets/
+├── dog-idle.svg
+├── dog-blink.svg
+├── dog-happy.svg
+├── dog-sleep.svg
+├── dog-eating.svg
+├── dog-playing.svg
+└── dog-petted.svg
+You may improve this structure if necessary.
+Create all required assets yourself. Do not leave placeholder images or missing files.
+6. GNOME 46 compatibility
+This is extremely important.
+
+* Use the correct GNOME Shell extension API for GNOME 46.
+* Include the correct metadata.json.
+* Ensure the extension can be installed through GNOME Extension Manager.
+* Ensure it can be enabled and disabled without restarting the computer.
+* Ensure all actors and event handlers are properly destroyed when disabled.
+* Avoid deprecated APIs wherever possible.
+* Make sure the extension does not break the GNOME desktop.
+
+7. Settings interface
+Create a preferences interface that allows me to:
+
+* Enable/disable animations.
+* Change dog size.
+* Enable/disable sound.
+* Change initial position.
+* Adjust animation frequency.
+* Toggle idle breathing.
+* Reset all settings.
+
+8. Development and delivery requirements
+I want the COMPLETE WORKING SOURCE CODE.
+Do not just explain how to build it.
+Generate every required file with complete code.
+If you have access to a terminal or file-generation environment, create the actual extension directory and provide it as a ZIP archive.
+If you cannot generate files directly, provide the contents of every file separately with its exact filename.
+Also provide:
+
+1. Installation instructions for Ubuntu 24.04.
+2. Commands to compile the GSettings schema.
+3. Commands to install the extension locally.
+4. Instructions for enabling it using GNOME Extension Manager.
+5. Instructions for debugging errors using journalctl.
+6. Instructions for completely uninstalling it.
+
+9. Testing checklist
+Before declaring the project complete, verify:
+
+* The extension loads on GNOME 46.
+* The dog appears on the desktop.
+* The dog remains stationary when idle.
+* Clicking triggers the correct animations.
+* Dragging works correctly.
+* Right-click menu works.
+* The position is remembered.
+* The extension can be disabled without errors.
+* No excessive CPU consumption occurs.
+* No errors are generated during normal operation.
+
+If any feature cannot be implemented reliably using GNOME 46 APIs, explain the limitation instead of pretending it works.
+FINAL REQUIREMENT
+Prioritize stability, simplicity, performance, and a genuinely cute dog.
+I want a little dog companion that sits quietly on my Ubuntu desktop, occasionally blinks and wags its tail, and becomes interactive when I click or pet it.
+It must NOT behave like Gnomelets.
+Start by explaining the architecture briefly, then generate the complete project and all its files. generate the actual files, not just snippets of code and validate the extension using gnome-extensions and GNOME 46 compatibility checks, Don't install it until you've checked that the extension has no obvious errors.
