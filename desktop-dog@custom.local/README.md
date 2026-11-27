@@ -138,6 +138,29 @@ re-run the `glib-compile-schemas …/schemas/` step and restart the shell.
 
 ---
 
+## Fresh start (reset settings)
+
+If the dog doesn't appear, or you want to restore the default settings and position, reset the extension's saved settings:
+
+```bash
+gnome-extensions disable desktop-dog@custom.local
+dconf reset -f /org/gnome/shell/extensions/desktop-dog/
+gnome-extensions enable desktop-dog@custom.local
+```
+
+This resets every option, including the dog's saved position, to defaults. If you replaced the extension files, log out and back in first so GNOME Shell loads the new code.## Fresh start (reset settings)
+
+If the dog doesn't appear, or you want to restore the default settings and position, reset the extension's saved settings:
+
+```bash
+gnome-extensions disable desktop-dog@custom.local
+dconf reset -f /org/gnome/shell/extensions/desktop-dog/
+gnome-extensions enable desktop-dog@custom.local
+```
+
+This resets every option, including the dog's saved position, to defaults. If you replaced the extension files, log out and back in first so GNOME Shell loads the new code.
+---
+
 ## Uninstall
 
 ```bash
