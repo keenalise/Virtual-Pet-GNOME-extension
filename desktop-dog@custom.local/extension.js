@@ -44,7 +44,6 @@ class DogManager {
         this._idleTimer = 0;
         this._transientTimer = 0;
         this._singleClickTimer = 0;
-        this._lastClickTime = 0;
         this._sleepZTimer = 0;
         this._grab = null;
         this._dragEventId = 0;
@@ -57,13 +56,29 @@ class DogManager {
     build() {
         const size = this._size();
 
-        this._icon = new St.Icon({
-            gicon: this._gicon('dog-idle'),
-            icon_size: size,
+        this._icon = new St.Widget({
+            layout_manager: new Clutter.BinLayout(),
             x_align: Clutter.ActorAlign.CENTER,
             y_align: Clutter.ActorAlign.CENTER,
         });
+        this._icon.set_size(size, size);
         this._icon.set_pivot_point(0.5, 1.0); // scale/rotate from the feet
+
+        // One St.Icon per pose, toggled by visibility. Swapping `gicon` on a
+        // single icon forever leaks closure notifiers (GLib warning).
+        this._poseIcons = {};
+        for (const pose of ['dog-idle', 'dog-blink', 'dog-wag', 'dog-happy',
+            'dog-petted', 'dog-eating', 'dog-playing', 'dog-sleep']) {
+            const poseIcon = new St.Icon({
+                gicon: this._gicon(pose),
+                icon_size: size,
+                x_align: Clutter.ActorAlign.CENTER,
+                y_align: Clutter.ActorAlign.CENTER,
+                visible: pose === 'dog-idle',
+            });
+            this._poseIcons[pose] = poseIcon;
+            this._icon.add_child(poseIcon);
+        }
 
         this._fx = new St.Label({
             style_class: 'desktop-dog-fx',
@@ -174,6 +189,7 @@ class DogManager {
             this._container = null;
         }
         this._icon = null;
+        this._poseIcons = null;
         this._fx = null;
         this._soundCtx = undefined;
         this._settings = null;
@@ -191,8 +207,10 @@ class DogManager {
     }
 
     _setIcon(pose) {
-        if (this._icon)
-            this._icon.gicon = this._gicon(pose);
+        if (!this._icon || !this._poseIcons)
+            return;
+        for (const [name, poseIcon] of Object.entries(this._poseIcons))
+            poseIcon.visible = name === pose;
     }
 
     _size() {
@@ -214,6 +232,16 @@ class DogManager {
     }
 
     // ---- positioning -----------------------------------------------------
+
+    _workArea(x, y) {
+        const size = this._size();
+        const cx = x + size / 2, cy = y + size / 2;
+        let mon = Main.layoutManager.monitors.find(m =>
+            cx >= m.x && cx < m.x + m.width && cy >= m.y && cy < m.y + m.height);
+        if (!mon)
+            mon = Main.layoutManager.primaryMonitor;
+        return Main.layoutManager.getWorkAreaForMonitor(mon.index);
+    }
 
     _defaultPosition() {
         const size = this._size();
@@ -237,26 +265,11 @@ class DogManager {
         return [Math.round(x), Math.round(y)];
     }
 
-    // Clamp to the full union of all monitors so the dog can be dropped
-    // anywhere on screen (including over the top bar and screen edges),
-    // while never going completely off-screen.
     _clamp(x, y) {
         const size = this._size();
-        const monitors = Main.layoutManager.monitors;
-        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-        for (const m of monitors) {
-            minX = Math.min(minX, m.x);
-            minY = Math.min(minY, m.y);
-            maxX = Math.max(maxX, m.x + m.width);
-            maxY = Math.max(maxY, m.y + m.height);
-        }
-        if (!isFinite(minX)) {
-            const pm = Main.layoutManager.primaryMonitor;
-            minX = pm.x; minY = pm.y;
-            maxX = pm.x + pm.width; maxY = pm.y + pm.height;
-        }
-        const nx = Math.max(minX, Math.min(maxX - size, x));
-        const ny = Math.max(minY, Math.min(maxY - size, y));
+        const wa = this._workArea(x, y);
+        const nx = Math.max(wa.x, Math.min(wa.x + wa.width - size, x));
+        const ny = Math.max(wa.y, Math.min(wa.y + wa.height - size, y));
         return [Math.round(nx), Math.round(ny)];
     }
 
@@ -286,7 +299,9 @@ class DogManager {
         if (!this._container)
             return;
         const size = this._size();
-        this._icon.icon_size = size;
+        this._icon.set_size(size, size);
+        for (const poseIcon of Object.values(this._poseIcons))
+            poseIcon.icon_size = size;
         this._container.set_size(size, size);
         const [x, y] = this._clamp(this._container.x, this._container.y);
         this._container.set_position(x, y);
@@ -539,12 +554,15 @@ class DogManager {
     }
 
     _reactPlay() {
-        this._clearSingleClickTimer();
-        this._lastClickTime = 0;
+        if (this._singleClickTimer) {
+            GLib.Source.remove(this._singleClickTimer);
+            this._timeouts.delete(this._singleClickTimer);
+            this._singleClickTimer = 0;
+        }
         this._wake();
         this._enterTransient('playing', 'dog-playing', 2200);
         this._hopTwice();
-        this._popEffect('★');  // star (widely available glyph)
+        this._popEffect('✨');  // sparkles
         this._playSound();
     }
 
@@ -789,6 +807,7 @@ class DogManager {
                 ox: this._container.x,
                 oy: this._container.y,
                 moved: false,
+                click: event.get_click_count(),
             };
             this._grab = global.stage.grab(this._container);
             this._dragEventId = this._container.connect('event',
@@ -827,13 +846,13 @@ class DogManager {
         }
 
         if (type === Clutter.EventType.BUTTON_RELEASE) {
-            const moved = this._drag.moved;
+            const {moved, click} = this._drag;
             this._endDrag();
             if (moved) {
                 this._savePosition();
                 this._rest();
             } else {
-                this._onClick();
+                this._onClick(click);
             }
             return Clutter.EVENT_STOP;
         }
@@ -853,30 +872,17 @@ class DogManager {
         this._drag = null;
     }
 
-    _clearSingleClickTimer() {
-        if (this._singleClickTimer) {
-            GLib.Source.remove(this._singleClickTimer);
-            this._timeouts.delete(this._singleClickTimer);
-            this._singleClickTimer = 0;
-        }
-    }
-
-    // Double-click is detected by timing between releases, because Mutter's
-    // event object here does not expose get_click_count().
-    _onClick() {
-        const now = GLib.get_monotonic_time() / 1000; // ms
-        if (this._lastClickTime > 0 &&
-            now - this._lastClickTime < DOUBLE_CLICK_MS) {
-            this._lastClickTime = 0;
-            this._clearSingleClickTimer();
+    _onClick(clickCount) {
+        if (clickCount >= 2) {
             this._reactPlay();
             return;
         }
-        this._lastClickTime = now;
-        this._clearSingleClickTimer();
-        this._singleClickTimer = this._addTimeout(DOUBLE_CLICK_MS + 30, () => {
+        if (this._singleClickTimer) {
+            GLib.Source.remove(this._singleClickTimer);
+            this._timeouts.delete(this._singleClickTimer);
+        }
+        this._singleClickTimer = this._addTimeout(DOUBLE_CLICK_MS, () => {
             this._singleClickTimer = 0;
-            this._lastClickTime = 0;
             this._reactHappy();
         });
     }

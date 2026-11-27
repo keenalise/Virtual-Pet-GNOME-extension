@@ -4,19 +4,22 @@ import Adw from 'gi://Adw';
 import Gtk from 'gi://Gtk';
 import Gio from 'gi://Gio';
 
-import {ExtensionPreferences, gettext as _} from
-    'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
-
-const POSITIONS = [
-    ['bottom-right', _('Bottom-right')],
-    ['bottom-left',  _('Bottom-left')],
-    ['top-right',    _('Top-right')],
-    ['top-left',     _('Top-left')],
-    ['center',       _('Center')],
-];
+import {ExtensionPreferences} from
+    'resource:///org/gnome/shell/extensions/prefs.js';
 
 export default class DesktopDogPreferences extends ExtensionPreferences {
     fillPreferencesWindow(window) {
+        const _ = this.gettext.bind(this);
+
+        const POSITIONS = [
+            ['bottom-right', _('Bottom-right')],
+            ['bottom-left',  _('Bottom-left')],
+            ['top-right',    _('Top-right')],
+            ['top-left',     _('Top-left')],
+            ['center',       _('Center')],
+        ];
+        this._positions = POSITIONS;
+
         const settings = this.getSettings();
         window.set_default_size(560, 640);
 
@@ -143,7 +146,7 @@ export default class DesktopDogPreferences extends ExtensionPreferences {
 
     _positionModel() {
         const model = new Gtk.StringList();
-        for (const [, label] of POSITIONS)
+        for (const [, label] of this._positions)
             model.append(label);
         return model;
     }
