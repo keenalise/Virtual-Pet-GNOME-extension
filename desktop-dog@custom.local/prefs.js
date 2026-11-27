@@ -5,7 +5,7 @@ import Gtk from 'gi://Gtk';
 import Gio from 'gi://Gio';
 
 import {ExtensionPreferences, gettext as _} from
-    'resource:///org/gnome/shell/extensions/prefs.js';
+    'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
 const POSITIONS = [
     ['bottom-right', _('Bottom-right')],

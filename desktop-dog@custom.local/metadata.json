@@ -4,8 +4,8 @@
   "description": "A cute, stationary pixel-art puppy that sits quietly on your desktop. It blinks, wags its tail and breathes on its own, and becomes interactive when you click, double-click, drag, pet or feed it. It never wanders off by itself.",
   "shell-version": ["46"],
   "session-modes": ["user"],
-  "version": 1,
-  "version-name": "1.0.0",
+  "version": 2,
+  "version-name": "1.0.1",
   "settings-schema": "org.gnome.shell.extensions.desktop-dog",
   "gettext-domain": "desktop-dog",
   "url": "https://example.com/desktop-dog"
